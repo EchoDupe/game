@@ -1,217 +1,225 @@
 <!DOCTYPE html>
 <html>
 <head>
-<title>EchoDupe Mini Tycoon</title>
-
-<script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
-
-<style>
-body{
-margin:0;
-overflow:hidden;
-font-family:Arial;
-}
-
-#ui{
-position:absolute;
-top:10px;
-left:10px;
-color:white;
-font-size:18px;
-background:rgba(0,0,0,0.5);
-padding:10px;
-border-radius:8px;
-}
-</style>
+    <title>EchoDupe Tycoon v2</title>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
+    <style>
+        body { margin: 0; overflow: hidden; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; }
+        #crosshair {
+            position: absolute; top: 50%; left: 50%;
+            width: 10px; height: 10px; border: 2px solid white;
+            border-radius: 50%; transform: translate(-50%, -50%);
+            pointer-events: none;
+        }
+        #ui {
+            position: absolute; top: 20px; left: 20px;
+            color: white; background: rgba(0,0,0,0.7);
+            padding: 15px; border-radius: 10px; border: 2px solid #3399ff;
+        }
+        #shop-gui {
+            position: absolute; right: 20px; top: 20px;
+            width: 250px; background: rgba(20, 20, 20, 0.85);
+            color: white; padding: 20px; border-radius: 10px;
+            border: 2px solid #ffcc00;
+        }
+        .btn {
+            background: #444; color: white; border: none;
+            padding: 8px; width: 100%; margin-top: 10px;
+            cursor: pointer; border-radius: 5px; transition: 0.2s;
+        }
+        .btn:hover { background: #666; }
+        .btn:disabled { background: #222; color: #555; cursor: not-allowed; }
+    </style>
 </head>
-
 <body>
 
+<div id="crosshair"></div>
+
 <div id="ui">
-<b>EchoDupe Mini Tycoon</b><br>
-Money: $<span id="money">0</span><br>
-Workers: <span id="workers">0</span><br>
-Walk into trees 🌳 for $5<br>
-Blue house = buy worker ($25)
+    <b style="font-size: 20px; color: #ffcc00;">EchoDupe Tycoon</b><br>
+    Money: <span id="money" style="color: #44ff44; font-weight: bold;">$0</span><br>
+    Income: +$<span id="income">0</span>/sec<br>
+    Multiplier: <span id="mult">1.0</span>x
+</div>
+
+<div id="shop-gui">
+    <h3 style="margin-top:0">Upgrades</h3>
+    <div>
+        Worker (Auto-Cash)<br>
+        <button class="btn" id="buyWorker" onclick="buyWorker()">Buy: $25</button>
+    </div>
+    <div style="margin-top:15px">
+        Income Boost (+0.5x)<br>
+        <button class="btn" id="buyBoost" onclick="buyBoost()">Buy: $100</button>
+    </div>
+    <p style="font-size: 11px; color: #aaa; margin-top:20px;">* Prices increase with each purchase.<br>Click screen to move.*</p>
 </div>
 
 <script>
+let scene = new THREE.Scene();
+scene.background = new THREE.Color(0x87ceeb);
+scene.fog = new THREE.Fog(0x87ceeb, 1, 150);
 
-let scene = new THREE.Scene()
-scene.background = new THREE.Color(0x87ceeb)
+let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000);
+let renderer = new THREE.WebGLRenderer({ antialias: true });
+renderer.setSize(window.innerWidth, window.innerHeight);
+document.body.appendChild(renderer.domElement);
 
-let camera = new THREE.PerspectiveCamera(75, window.innerWidth/window.innerHeight, 0.1, 1000)
+// Lights
+let ambient = new THREE.AmbientLight(0xffffff, 0.6);
+scene.add(ambient);
+let sun = new THREE.DirectionalLight(0xffffff, 0.8);
+sun.position.set(50, 100, 50);
+scene.add(sun);
 
-let renderer = new THREE.WebGLRenderer()
-renderer.setSize(window.innerWidth,window.innerHeight)
-document.body.appendChild(renderer.domElement)
+// World Setup
+let ground = new THREE.Mesh(new THREE.PlaneGeometry(300, 300), new THREE.MeshStandardMaterial({color: 0x3aa655}));
+ground.rotation.x = -Math.PI/2;
+scene.add(ground);
 
-let light = new THREE.DirectionalLight(0xffffff,1)
-light.position.set(50,100,50)
-scene.add(light)
+// Add Paths
+let path = new THREE.Mesh(new THREE.PlaneGeometry(10, 100), new THREE.MeshStandardMaterial({color: 0x8b7355}));
+path.rotation.x = -Math.PI/2;
+path.position.y = 0.01;
+scene.add(path);
 
-let groundGeo = new THREE.PlaneGeometry(200,200)
-let groundMat = new THREE.MeshStandardMaterial({color:0x3aa655})
-let ground = new THREE.Mesh(groundGeo,groundMat)
-ground.rotation.x = -Math.PI/2
-scene.add(ground)
+// Tycoon Logic Variables
+let stats = {
+    money: 0,
+    workers: 0,
+    multiplier: 1.0,
+    workerPrice: 25,
+    boostPrice: 100,
+    baseIncome: 0.1 // per worker per frame approx
+};
 
-camera.position.y = 2
+let trees = [];
+let workerModels = [];
 
-let player = {
-x:0,
-z:0,
-speed:0.2
+function createTree(x, z) {
+    let group = new THREE.Group();
+    let trunk = new THREE.Mesh(new THREE.CylinderGeometry(0.3, 0.4, 2), new THREE.MeshStandardMaterial({color: 0x5d4037}));
+    trunk.position.y = 1;
+    let leaves = new THREE.Mesh(new THREE.SphereGeometry(1.5, 8, 8), new THREE.MeshStandardMaterial({color: 0x2e7d32}));
+    leaves.position.y = 2.5;
+    group.add(trunk, leaves);
+    group.position.set(x, 0, z);
+    scene.add(group);
+    trees.push({mesh: group, x: x, z: z});
 }
 
-let money = 0
-let workers = 0
-
-let trees = []
-
-function createTree(x,z){
-
-let trunkGeo = new THREE.CylinderGeometry(0.3,0.3,2)
-let trunkMat = new THREE.MeshStandardMaterial({color:0x8b5a2b})
-let trunk = new THREE.Mesh(trunkGeo,trunkMat)
-trunk.position.set(x,1,z)
-scene.add(trunk)
-
-let leavesGeo = new THREE.SphereGeometry(1.2)
-let leavesMat = new THREE.MeshStandardMaterial({color:0x2ecc71})
-let leaves = new THREE.Mesh(leavesGeo,leavesMat)
-leaves.position.set(x,2.5,z)
-scene.add(leaves)
-
-trees.push({x:x,z:z,trunk:trunk,leaves:leaves})
-
+// Populate Forest
+for(let i=0; i<60; i++) {
+    let rx = (Math.random()-0.5)*150;
+    let rz = (Math.random()-0.5)*150;
+    if(Math.abs(rx) < 8) rx += 15; // Keep paths clear
+    createTree(rx, rz);
 }
 
-for(let i=0;i<25;i++){
-createTree(
-(Math.random()-0.5)*100,
-(Math.random()-0.5)*100
-)
+// Shop Building
+let shopMesh = new THREE.Mesh(new THREE.BoxGeometry(6, 5, 6), new THREE.MeshStandardMaterial({color: 0x3399ff}));
+shopMesh.position.set(0, 2.5, -15);
+scene.add(shopMesh);
+
+// Player Movement Setup
+let player = { x: 0, z: 10, yaw: 0, speed: 0.15 };
+let keys = {};
+document.addEventListener("keydown", e => keys[e.key.toLowerCase()] = true);
+document.addEventListener("keyup", e => keys[e.key.toLowerCase()] = false);
+document.addEventListener("click", () => document.body.requestPointerLock());
+
+document.addEventListener("mousemove", e => {
+    if(document.pointerLockElement === document.body) {
+        player.yaw -= e.movementX * 0.002;
+        // Pitch removed for Horizontal-only view
+        camera.rotation.set(0, player.yaw, 0); 
+    }
+});
+
+// Shop Actions
+function buyWorker() {
+    if(stats.money >= stats.workerPrice) {
+        stats.money -= stats.workerPrice;
+        stats.workers++;
+        stats.workerPrice = Math.floor(stats.workerPrice * 1.25);
+        spawnWorkerModel();
+        updateUI();
+    }
 }
 
-let houseGeo = new THREE.BoxGeometry(5,4,5)
-let houseMat = new THREE.MeshStandardMaterial({color:0x3399ff})
-let shop = new THREE.Mesh(houseGeo,houseMat)
-shop.position.set(10,2,10)
-scene.add(shop)
-
-let keys = {}
-
-document.addEventListener("keydown",e=>{
-keys[e.key.toLowerCase()] = true
-})
-
-document.addEventListener("keyup",e=>{
-keys[e.key.toLowerCase()] = false
-})
-
-document.body.addEventListener("click",()=>{
-document.body.requestPointerLock()
-})
-
-let yaw = 0
-let pitch = 0
-
-document.addEventListener("mousemove",e=>{
-
-if(document.pointerLockElement===document.body){
-
-yaw -= e.movementX * 0.002
-pitch -= e.movementY * 0.002
-
-pitch = Math.max(-1.5, Math.min(1.5, pitch))
-
-camera.rotation.set(pitch,yaw,0)
-
+function buyBoost() {
+    if(stats.money >= stats.boostPrice) {
+        stats.money -= stats.boostPrice;
+        stats.multiplier += 0.5;
+        stats.boostPrice = Math.floor(stats.boostPrice * 1.5);
+        updateUI();
+    }
 }
 
-})
-
-function update(){
-
-let forwardX = Math.sin(yaw)
-let forwardZ = Math.cos(yaw)
-
-let rightX = Math.sin(yaw - Math.PI/2)
-let rightZ = Math.cos(yaw - Math.PI/2)
-
-if(keys["w"]){
-player.x += forwardX * player.speed
-player.z += forwardZ * player.speed
+function spawnWorkerModel() {
+    let worker = new THREE.Mesh(new THREE.BoxGeometry(0.8, 1.5, 0.8), new THREE.MeshStandardMaterial({color: 0xff4444}));
+    worker.position.set(5 + Math.random()*5, 0.75, -15 + Math.random()*5);
+    scene.add(worker);
+    workerModels.push(worker);
 }
 
-if(keys["s"]){
-player.x -= forwardX * player.speed
-player.z -= forwardZ * player.speed
+function updateUI() {
+    document.getElementById("money").innerText = "$" + Math.floor(stats.money);
+    document.getElementById("income").innerText = (stats.workers * 5 * stats.multiplier).toFixed(1);
+    document.getElementById("mult").innerText = stats.multiplier.toFixed(1);
+    document.getElementById("buyWorker").innerText = "Buy: $" + stats.workerPrice;
+    document.getElementById("buyBoost").innerText = "Buy: $" + stats.boostPrice;
+    
+    document.getElementById("buyWorker").disabled = stats.money < stats.workerPrice;
+    document.getElementById("buyBoost").disabled = stats.money < stats.boostPrice;
 }
 
-if(keys["a"]){
-player.x += rightX * player.speed
-player.z += rightZ * player.speed
+function update() {
+    // Movement
+    if(keys["w"]) { player.x += Math.sin(player.yaw) * player.speed; player.z += Math.cos(player.yaw) * player.speed; }
+    if(keys["s"]) { player.x -= Math.sin(player.yaw) * player.speed; player.z -= Math.cos(player.yaw) * player.speed; }
+    if(keys["a"]) { player.x += Math.sin(player.yaw + Math.PI/2) * player.speed; player.z += Math.cos(player.yaw + Math.PI/2) * player.speed; }
+    if(keys["d"]) { player.x -= Math.sin(player.yaw + Math.PI/2) * player.speed; player.z -= Math.cos(player.yaw + Math.PI/2) * player.speed; }
+
+    camera.position.set(player.x, 2, player.z);
+
+    // Tree Interaction (Woodcutting)
+    trees.forEach(tree => {
+        let d = Math.sqrt((player.x-tree.x)**2 + (player.z-tree.z)**2);
+        if(d < 2.5) {
+            stats.money += 2 * stats.multiplier;
+            tree.mesh.position.x = (Math.random()-0.5)*150;
+            tree.mesh.position.z = (Math.random()-0.5)*150;
+            tree.x = tree.mesh.position.x;
+            tree.z = tree.mesh.position.z;
+        }
+    });
+
+    // Passive Income
+    stats.money += (stats.workers * 0.05) * stats.multiplier;
+    
+    // Animate Workers
+    workerModels.forEach((w, i) => {
+        w.rotation.y += 0.02;
+        w.position.y = 0.75 + Math.sin(Date.now() * 0.005 + i) * 0.1;
+    });
+
+    updateUI();
 }
 
-if(keys["d"]){
-player.x -= rightX * player.speed
-player.z -= rightZ * player.speed
+function animate() {
+    update();
+    renderer.render(scene, camera);
+    requestAnimationFrame(animate);
 }
 
-camera.position.x = player.x
-camera.position.z = player.z
+animate();
 
-trees.forEach(tree=>{
-
-let dx = player.x-tree.x
-let dz = player.z-tree.z
-let dist = Math.sqrt(dx*dx+dz*dz)
-
-if(dist<2){
-
-money += 5
-
-tree.x = (Math.random()-0.5)*100
-tree.z = (Math.random()-0.5)*100
-
-tree.trunk.position.set(tree.x,1,tree.z)
-tree.leaves.position.set(tree.x,2.5,tree.z)
-
-}
-
-})
-
-let dx = player.x-shop.position.x
-let dz = player.z-shop.position.z
-let dist = Math.sqrt(dx*dx+dz*dz)
-
-if(dist<4 && money>=25){
-money -= 25
-workers++
-}
-
-money += workers * 0.05
-
-document.getElementById("money").innerText = Math.floor(money)
-document.getElementById("workers").innerText = workers
-
-}
-
-function animate(){
-
-update()
-
-renderer.render(scene,camera)
-
-requestAnimationFrame(animate)
-
-}
-
-animate()
-
+window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+});
 </script>
-
 </body>
 </html>
