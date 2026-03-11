@@ -17,7 +17,7 @@
             min-height: 100vh; overflow: hidden;
         }
 
-        /* Scanlines */
+        /* Scanline Effect */
         body::before {
             content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
@@ -58,9 +58,9 @@
         .game-card .ver-tag { font-size: 0.9em; color: var(--dark-gray); margin-top: 15px; display: block; letter-spacing: 3px; }
 
         .footer { margin-top: auto; padding: 60px 0 20px 0; font-size: 0.85em; letter-spacing: 2px; z-index: 10; }
-        .footer span { color: var(--dark-gray); }
         .footer b { color: var(--neon); }
 
+        /* Loading Screen */
         #loader {
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
             background: #000; z-index: 300; flex-direction: column;
@@ -73,7 +73,7 @@
 <body>
 
 <div id="loader">
-    <div style="font-size: 0.9em; letter-spacing: 6px; opacity: 0.8; font-weight: bold;">CONNECTING_TO_SERVER</div>
+    <div style="font-size: 0.9em; letter-spacing: 6px; opacity: 0.8; font-weight: bold;">CONNECTING_TO_SIMULATION</div>
     <div id="bar-container"><div id="bar"></div></div>
 </div>
 
@@ -83,7 +83,7 @@
 </div>
 
 <div id="game-grid">
-    <div class="game-card" onclick="boot('games/TreeSimulator.html')">
+    <div class="game-card" onclick="boot('Games/TreeSimulator.html')">
         <h3>TREE</h3>
         <span class="ver-tag">SIMULATOR_ENV</span>
     </div>
@@ -103,7 +103,7 @@
                 clearInterval(interval);
                 window.location.href = url;
             } else {
-                width += Math.random() * 30;
+                width += Math.random() * 35; // Fast, digital feel
                 bar.style.width = Math.min(width, 100) + '%';
             }
         }, 100);
