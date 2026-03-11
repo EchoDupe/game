@@ -1,63 +1,63 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>EchoDupe | Games</title>
     <link rel="icon" type="image/png" href="assets/title.png">
     
     <style>
-        :root { --neon: #00ffff; --bg: #000a0a; --dark-gray: #555555; }
+        :root { --neon: #00ffff; --bg: #000a0a; --dark-gray: #555555; --card-bg: rgba(0, 15, 15, 0.8); }
         
         body { 
             background: var(--bg); color: var(--neon); 
             font-family: 'Courier New', monospace; 
-            margin: 0; padding: 40px 20px;
+            margin: 0; padding: 60px 20px;
             display: flex; flex-direction: column; align-items: center;
-            min-height: 100vh;
+            min-height: 100vh; overflow: hidden;
         }
 
-        /* Static Scanlines */
+        /* Scanlines */
         body::before {
-            content: " "; display: block; position: absolute; top: 0; left: 0; bottom: 0; right: 0;
+            content: " "; display: block; position: fixed; top: 0; left: 0; bottom: 0; right: 0;
             background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
             z-index: 200; background-size: 100% 4px; pointer-events: none;
         }
 
-        #header { text-align: center; margin-bottom: 60px; z-index: 10; }
+        #header { text-align: center; margin-bottom: 70px; z-index: 10; }
         #title-img { 
-            width: 100%; max-width: 500px; height: auto; 
-            filter: drop-shadow(0 0 15px rgba(0, 255, 255, 0.3));
+            width: 100%; max-width: 550px; height: auto; 
+            filter: drop-shadow(0 0 15px rgba(0, 255, 255, 0.4));
         }
         .header-subtitle { 
-            font-size: 1.5em; letter-spacing: 12px; margin-top: 15px; 
-            font-weight: bold; text-shadow: 0 0 10px var(--neon);
+            font-size: 1.8em; letter-spacing: 15px; margin-top: 20px; 
+            font-weight: bold; text-shadow: 0 0 12px var(--neon);
         }
 
         #game-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 30px; width: 100%; max-width: 1000px; z-index: 10;
+            display: flex; justify-content: center; width: 100%; max-width: 1100px; z-index: 10;
         }
 
         .game-card {
-            background: rgba(0, 15, 15, 0.8);
+            background: var(--card-bg);
             border: 1px solid #004444;
-            padding: 40px 20px;
+            padding: 60px 80px;
             text-align: center;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
         .game-card:hover {
             border-color: var(--neon);
-            background: rgba(0, 255, 255, 0.05);
-            transform: translateY(-5px);
-            box-shadow: 0 0 20px rgba(0, 255, 255, 0.2);
+            background: rgba(0, 255, 255, 0.08);
+            transform: scale(1.05);
+            box-shadow: 0 10px 40px rgba(0, 255, 255, 0.3);
         }
 
-        .game-card h3 { margin: 0; font-size: 1.2em; letter-spacing: 3px; }
-        .game-card .ver-tag { font-size: 0.7em; color: var(--dark-gray); margin-top: 8px; display: block; }
+        .game-card h3 { margin: 0; font-size: 2em; letter-spacing: 6px; font-weight: 900; }
+        .game-card .ver-tag { font-size: 0.9em; color: var(--dark-gray); margin-top: 15px; display: block; letter-spacing: 3px; }
 
-        .footer { margin-top: auto; padding-top: 60px; font-size: 0.85em; letter-spacing: 1px; z-index: 10; }
+        .footer { margin-top: auto; padding: 60px 0 20px 0; font-size: 0.85em; letter-spacing: 2px; z-index: 10; }
         .footer span { color: var(--dark-gray); }
         .footer b { color: var(--neon); }
 
@@ -66,14 +66,14 @@
             background: #000; z-index: 300; flex-direction: column;
             align-items: center; justify-content: center;
         }
-        #bar-container { width: 200px; height: 2px; border: 1px solid #003333; margin-top: 20px; }
-        #bar { width: 0%; height: 100%; background: var(--neon); }
+        #bar-container { width: 250px; height: 2px; border: 1px solid #003333; margin-top: 25px; }
+        #bar { width: 0%; height: 100%; background: var(--neon); box-shadow: 0 0 10px var(--neon); }
     </style>
 </head>
 <body>
 
 <div id="loader">
-    <div style="font-size: 0.8em; letter-spacing: 5px; opacity: 0.7;">LOADING SIMULATION...</div>
+    <div style="font-size: 0.9em; letter-spacing: 6px; opacity: 0.8; font-weight: bold;">CONNECTING_TO_SERVER</div>
     <div id="bar-container"><div id="bar"></div></div>
 </div>
 
@@ -85,17 +85,7 @@
 <div id="game-grid">
     <div class="game-card" onclick="boot('games/TreeSimulator.html')">
         <h3>TREE</h3>
-        <span class="ver-tag">SIMULATOR</span>
-    </div>
-
-    <div class="game-card" onclick="boot('v6-5/index.html')">
-        <h3>SIMULATION</h3>
-        <span class="ver-tag">VERSION 6.5</span>
-    </div>
-
-    <div class="game-card" onclick="boot('v6-4/index.html')">
-        <h3>LEGACY</h3>
-        <span class="ver-tag">VERSION 6.4</span>
+        <span class="ver-tag">SIMULATOR_ENV</span>
     </div>
 </div>
 
@@ -113,10 +103,10 @@
                 clearInterval(interval);
                 window.location.href = url;
             } else {
-                width += Math.random() * 40;
+                width += Math.random() * 30;
                 bar.style.width = Math.min(width, 100) + '%';
             }
-        }, 80);
+        }, 100);
     }
 </script>
 
