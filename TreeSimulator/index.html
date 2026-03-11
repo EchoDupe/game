@@ -2,8 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>EchoDupe | Tree Simulator</title>
-    <link rel="icon" type="image/png" href="../assets/title.png">
+    <title>EchoDupe | Tree Simulator Pro</title>
     <style>
         :root { --neon: #00ffff; --gold: #ffd700; }
         body { margin: 0; overflow: hidden; font-family: 'Segoe UI', sans-serif; background: #87CEEB; color: white; user-select: none; }
@@ -12,7 +11,12 @@
             position: absolute; top: 20px; left: 20px;
             background: rgba(0,0,0,0.7); padding: 15px 25px; 
             border-radius: 15px; border-left: 5px solid var(--neon); z-index: 10;
-            backdrop-filter: blur(8px); pointer-events: none; /* Let clicks pass through to game */
+            backdrop-filter: blur(8px); pointer-events: none;
+        }
+
+        #controls-hint {
+            position: absolute; bottom: 20px; left: 20px;
+            background: rgba(0,0,0,0.5); padding: 10px; border-radius: 10px; font-size: 0.8em;
         }
 
         .menu-gui {
@@ -21,63 +25,54 @@
             background: #fff; color: #222; border-radius: 20px;
             padding: 30px; z-index: 2000; text-align: center;
             box-shadow: 0 20px 60px rgba(0,0,0,0.4);
-            pointer-events: auto; /* IMPORTANT: Makes buttons clickable */
         }
 
-        .setting-row { display: flex; justify-content: space-between; align-items: center; margin: 15px 0; font-weight: bold; }
-        
         .btn {
             width: 100%; padding: 12px; margin: 8px 0;
             background: #eee; border: none; border-radius: 10px;
             color: #333; cursor: pointer; font-weight: bold; transition: 0.2s;
-            display: block;
+            display: block; font-size: 1em;
         }
         .btn:hover { background: var(--neon); color: black; }
-        
-        #crosshair {
-            position: fixed; top: 50%; left: 50%;
-            width: 8px; height: 8px; background: rgba(255,255,255,0.5);
-            border-radius: 50%; transform: translate(-50%, -50%);
-            pointer-events: none; z-index: 5;
+
+        #tp-btn {
+            position: absolute; top: 20px; right: 20px;
+            padding: 10px 20px; background: var(--neon); color: black;
+            border-radius: 10px; font-weight: bold; cursor: pointer; z-index: 10;
         }
     </style>
 </head>
 <body>
 
-<div id="crosshair"></div>
+<div id="tp-btn" onclick="teleportToShop()">Teleport to Shop [K]</div>
 
 <div id="ui">
-    <div style="font-size: 0.7em; letter-spacing: 2px; opacity: 0.8;">BALANCE</div>
+    <div style="font-size: 0.7em; letter-spacing: 2px;">BALANCE</div>
     <div style="font-size: 2.2em; font-weight: 900; color: var(--neon);">$<span id="money">0</span></div>
-    <div style="font-size: 0.7em; margin-top: 5px; color: #fff;">[E] OPEN SHOP | [P] SETTINGS</div>
+    <div style="font-size: 0.8em;">[E] SHOP | [P] SETTINGS | [SPACE] JUMP</div>
 </div>
 
+<div id="controls-hint">WASD to Move | Shift to Sprint | Click to Look</div>
+
 <div id="store-gui" class="menu-gui">
-    <h2 style="margin:0 0 10px 0; color:#2e7d32;">VILLAGE SHOP</h2>
-    <p style="font-size: 0.8em; color:#666;">Stand near the brown house to buy!</p>
+    <h2 style="color:#2e7d32;">VILLAGE SHOP</h2>
     <button class="btn" onclick="buyWorker()">HIRE DRONE ($<span id="w-cost">25</span>)</button>
-    <button class="btn" onclick="doRebirth()" style="color: #b8860b; border: 1px solid #b8860b;">REBIRTH ($5,000)</button>
-    <button class="btn" onclick="closeMenus()" style="background:#333; color:white; margin-top: 15px;">BACK TO GAME</button>
+    <button class="btn" onclick="doRebirth()" style="color: #b8860b;">REBIRTH ($5,000)</button>
+    <button class="btn" onclick="closeMenus()" style="background:#333; color:white;">BACK TO GAME</button>
 </div>
 
 <div id="settings-gui" class="menu-gui">
-    <h2 style="margin-top:0;">GAME SETTINGS</h2>
-    <div class="setting-row">
-        <span>Sensitivity</span>
-        <input type="range" id="sens-slider" min="1" max="10" value="3" oninput="updateSens(this.value)">
-    </div>
-    <div class="btn" onclick="resetGame()" style="color:red; background:rgba(255,0,0,0.1);">HARD RESET DATA</div>
-    <button class="btn" onclick="closeMenus()" style="background:#333; color:white;">BACK TO GAME</button>
+    <h2>SETTINGS</h2>
+    <button class="btn" onclick="resetGame()" style="color:red;">RESET DATA</button>
+    <button class="btn" onclick="closeMenus()" style="background:#333; color:white;">CLOSE</button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.158.0/build/three.min.js"></script>
 <script src="game.js"></script>
-
 <script>
     function closeMenus() {
-        document.getElementById('store-gui').style.display = 'none';
-        document.getElementById('settings-gui').style.display = 'none';
-        // Only request lock when explicitly closing via button
+        document.querySelectorAll('.menu-gui').forEach(m => m.style.display = 'none');
+        isMenuOpen = false;
         document.body.requestPointerLock();
     }
 </script>
