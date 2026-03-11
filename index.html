@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Mini Walk Tycoon</title>
+<style>
+body {
+    margin:0;
+    background:#111;
+    color:white;
+    font-family:Arial;
+    text-align:center;
+}
+
+#ui{
+    position:absolute;
+    top:10px;
+    left:10px;
+    font-size:18px;
+}
+
+canvas{
+    background:#222;
+    display:block;
+    margin:auto;
+}
+</style>
+</head>
+
+<body>
+
+<div id="ui">
+Money: $<span id="money">0</span><br>
+Workers: <span id="workers">0</span><br>
+Walk to the blue shop to buy a worker ($50)
+</div>
+
+<canvas id="game" width="800" height="500"></canvas>
+
+<script>
+
+const canvas = document.getElementById("game")
+const ctx = canvas.getContext("2d")
+
+let money = 0
+let workers = 0
+
+const player = {
+    x:100,
+    y:100,
+    size:20,
+    speed:3
+}
+
+const keys = {}
+
+const moneyNodes = []
+
+for(let i=0;i<10;i++){
+    moneyNodes.push({
+        x:Math.random()*760,
+        y:Math.random()*460,
+        size:15
+    })
+}
+
+const shop = {
+    x:700,
+    y:200,
+    size:40
+}
+
+document.addEventListener("keydown", e=>{
+    keys[e.key.toLowerCase()] = true
+})
+
+document.addEventListener("keyup", e=>{
+    keys[e.key.toLowerCase()] = false
+})
+
+function update(){
+
+    if(keys["w"] || keys["arrowup"]) player.y -= player.speed
+    if(keys["s"] || keys["arrowdown"]) player.y += player.speed
+    if(keys["a"] || keys["arrowleft"]) player.x -= player.speed
+    if(keys["d"] || keys["arrowright"]) player.x += player.speed
+
+    player.x = Math.max(0,Math.min(canvas.width-player.size,player.x))
+    player.y = Math.max(0,Math.min(canvas.height-player.size,player.y))
+
+    moneyNodes.forEach(node=>{
+        if(
+            player.x < node.x + node.size &&
+            player.x + player.size > node.x &&
+            player.y < node.y + node.size &&
+            player.y + player.size > node.y
+        ){
+            money += 1
+            node.x = Math.random()*760
+            node.y = Math.random()*460
+        }
+    })
+
+    if(
+        player.x < shop.x + shop.size &&
+        player.x + player.size > shop.x &&
+        player.y < shop.y + shop.size &&
+        player.y + player.size > shop.y
+    ){
+        if(money >= 50){
+            money -= 50
+            workers++
+        }
+    }
+
+    money += workers * 0.02
+
+    document.getElementById("money").innerText = Math.floor(money)
+    document.getElementById("workers").innerText = workers
+}
+
+function draw(){
+
+    ctx.clearRect(0,0,canvas.width,canvas.height)
+
+    ctx.fillStyle = "green"
+    moneyNodes.forEach(node=>{
+        ctx.fillRect(node.x,node.y,node.size,node.size)
+    })
+
+    ctx.fillStyle = "blue"
+    ctx.fillRect(shop.x,shop.y,shop.size,shop.size)
+
+    ctx.fillStyle = "red"
+    ctx.fillRect(player.x,player.y,player.size,player.size)
+
+}
+
+function gameLoop(){
+    update()
+    draw()
+    requestAnimationFrame(gameLoop)
+}
+
+gameLoop()
+
+</script>
+</body>
+</html>
