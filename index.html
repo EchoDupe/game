@@ -28,9 +28,10 @@ border-radius:8px;
 <body>
 
 <div id="ui">
+<b>EchoDupe Mini Tycoon</b><br>
 Money: $<span id="money">0</span><br>
 Workers: <span id="workers">0</span><br>
-Walk into trees for money 🌳<br>
+Walk into trees 🌳 for $5<br>
 Blue house = buy worker ($25)
 </div>
 
@@ -60,7 +61,7 @@ camera.position.y = 2
 let player = {
 x:0,
 z:0,
-speed:0.15
+speed:0.2
 }
 
 let money = 0
@@ -73,18 +74,16 @@ function createTree(x,z){
 let trunkGeo = new THREE.CylinderGeometry(0.3,0.3,2)
 let trunkMat = new THREE.MeshStandardMaterial({color:0x8b5a2b})
 let trunk = new THREE.Mesh(trunkGeo,trunkMat)
-
 trunk.position.set(x,1,z)
 scene.add(trunk)
 
 let leavesGeo = new THREE.SphereGeometry(1.2)
 let leavesMat = new THREE.MeshStandardMaterial({color:0x2ecc71})
 let leaves = new THREE.Mesh(leavesGeo,leavesMat)
-
 leaves.position.set(x,2.5,z)
 scene.add(leaves)
 
-trees.push({x:x,z:z})
+trees.push({x:x,z:z,trunk:trunk,leaves:leaves})
 
 }
 
@@ -98,7 +97,6 @@ createTree(
 let houseGeo = new THREE.BoxGeometry(5,4,5)
 let houseMat = new THREE.MeshStandardMaterial({color:0x3399ff})
 let shop = new THREE.Mesh(houseGeo,houseMat)
-
 shop.position.set(10,2,10)
 scene.add(shop)
 
@@ -116,40 +114,50 @@ document.body.addEventListener("click",()=>{
 document.body.requestPointerLock()
 })
 
+let yaw = 0
+let pitch = 0
+
 document.addEventListener("mousemove",e=>{
+
 if(document.pointerLockElement===document.body){
 
-camera.rotation.y -= e.movementX*0.002
-camera.rotation.x -= e.movementY*0.002
+yaw -= e.movementX * 0.002
+pitch -= e.movementY * 0.002
 
-camera.rotation.x = Math.max(-1.2,Math.min(1.2,camera.rotation.x))
+pitch = Math.max(-1.5, Math.min(1.5, pitch))
+
+camera.rotation.set(pitch,yaw,0)
 
 }
+
 })
 
 function update(){
 
-let dirX = Math.sin(camera.rotation.y)
-let dirZ = Math.cos(camera.rotation.y)
+let forwardX = Math.sin(yaw)
+let forwardZ = Math.cos(yaw)
+
+let rightX = Math.sin(yaw - Math.PI/2)
+let rightZ = Math.cos(yaw - Math.PI/2)
 
 if(keys["w"]){
-player.x += dirX*player.speed
-player.z += dirZ*player.speed
+player.x += forwardX * player.speed
+player.z += forwardZ * player.speed
 }
 
 if(keys["s"]){
-player.x -= dirX*player.speed
-player.z -= dirZ*player.speed
+player.x -= forwardX * player.speed
+player.z -= forwardZ * player.speed
 }
 
 if(keys["a"]){
-player.x += dirZ*player.speed
-player.z -= dirX*player.speed
+player.x += rightX * player.speed
+player.z += rightZ * player.speed
 }
 
 if(keys["d"]){
-player.x -= dirZ*player.speed
-player.z += dirX*player.speed
+player.x -= rightX * player.speed
+player.z -= rightZ * player.speed
 }
 
 camera.position.x = player.x
@@ -162,9 +170,15 @@ let dz = player.z-tree.z
 let dist = Math.sqrt(dx*dx+dz*dz)
 
 if(dist<2){
+
 money += 5
+
 tree.x = (Math.random()-0.5)*100
 tree.z = (Math.random()-0.5)*100
+
+tree.trunk.position.set(tree.x,1,tree.z)
+tree.leaves.position.set(tree.x,2.5,tree.z)
+
 }
 
 })
@@ -178,7 +192,7 @@ money -= 25
 workers++
 }
 
-money += workers*0.05
+money += workers * 0.05
 
 document.getElementById("money").innerText = Math.floor(money)
 document.getElementById("workers").innerText = workers
