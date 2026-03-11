@@ -4,135 +4,52 @@
     <meta charset="utf-8">
     <title>EchoDupe | Neon Snake</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../assets/title.png">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+    <script src="https://cdn.tailwindcss.com"></script>
     <link rel="stylesheet" href="style.css">
-    
-    <style>
-        /* --- NEON OVERRIDES --- */
-        :root {
-            --neon-green: #39ff14;
-            --neon-red: #ff3131;
-            --bg-dark: #0a0b10;
-            --panel-bg: rgba(20, 22, 30, 0.9);
-        }
-
-        body {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            background: var(--bg-dark);
-            font-family: 'Segoe UI', Roboto, sans-serif;
-            color: white;
-            overflow: hidden;
-        }
-
-        .wrapper {
-            width: 100%;
-            max-width: 450px;
-            background: var(--panel-bg);
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: 0 0 30px rgba(0,0,0,0.5), 0 0 10px rgba(57, 255, 20, 0.1);
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .game-details {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            background: rgba(0,0,0,0.3);
-            border-radius: 12px;
-            margin-bottom: 20px;
-            font-weight: 700;
-            font-size: 1.1rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .score { color: var(--neon-green); }
-        .high-score { color: #ffd700; }
-
-        .play-board {
-            height: 350px;
-            width: 100%;
-            background: #000;
-            display: grid;
-            grid-template: repeat(30, 1fr) / repeat(30, 1fr);
-            border-radius: 8px;
-            border: 2px solid #1a1c23;
-            position: relative;
-        }
-
-        .head { background: var(--neon-green); box-shadow: 0 0 10px var(--neon-green); border-radius: 4px; }
-        .body { background: #2ecc71; opacity: 0.8; border-radius: 2px; }
-        .food { background: var(--neon-red); box-shadow: 0 0 15px var(--neon-red); border-radius: 50%; }
-
-        .controls {
-            display: flex;
-            justify-content: space-evenly;
-            margin-top: 25px;
-        }
-
-        .controls i {
-            width: 55px;
-            height: 55px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: #1a1c23;
-            border-radius: 12px;
-            font-size: 1.4rem;
-            cursor: pointer;
-            transition: 0.2s;
-            border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .controls i:hover { background: var(--neon-green); color: black; transform: scale(1.1); }
-        
-        .reset-btn {
-            width: 100%;
-            margin-top: 20px;
-            padding: 10px;
-            background: transparent;
-            color: var(--neon-red);
-            border: 1px solid var(--neon-red);
-            border-radius: 8px;
-            cursor: pointer;
-            font-weight: bold;
-            text-transform: uppercase;
-            font-size: 0.8rem;
-            transition: 0.3s;
-        }
-        .reset-btn:hover { background: var(--neon-red); color: white; }
-    </style>
 </head>
 <body>
 
+    <div class="bg-grid"></div>
+    <div class="bg-glow"></div>
+    <div class="scanline"></div>
+
     <div class="wrapper">
         <div class="game-details">
-            <span class="score">Score: 0</span>
-            <span class="high-score">Best: 0</span>
+            <div class="flex flex-col">
+                <span class="text-[9px] text-zinc-600 tracking-[0.3em] font-black">STATUS: ACTIVE</span>
+                <span class="score text-cyan-500 font-black italic text-xl">SCORE: 0</span>
+            </div>
+            <div class="flex flex-col text-right">
+                <span class="text-[9px] text-zinc-600 tracking-[0.3em] font-black">HIGHSCORE_DB</span>
+                <span class="high-score text-white font-black italic text-xl">BEST: 0</span>
+            </div>
         </div>
         
         <div class="play-board"></div>
         
         <div class="controls">
-            <i data-key="ArrowLeft" class="fa-solid fa-arrow-left-long"></i>
-            <i data-key="ArrowUp" class="fa-solid fa-arrow-up-long"></i>
-            <i data-key="ArrowDown" class="fa-solid fa-arrow-down-long"></i>
-            <i data-key="ArrowRight" class="fa-solid fa-arrow-right-long"></i>
+            <i data-key="w" class="fa-solid fa-chevron-up"></i>
+            <div class="flex gap-4">
+                <i data-key="a" class="fa-solid fa-chevron-left"></i>
+                <i data-key="s" class="fa-solid fa-chevron-down"></i>
+                <i data-key="d" class="fa-solid fa-chevron-right"></i>
+            </div>
         </div>
 
-        <button class="reset-btn" onclick="resetData()">Reset Player Data</button>
+        <div class="footer-actions">
+            <button class="reset-btn" onclick="resetData()">Wipe_Memory</button>
+            <a href="../index.html" class="back-logo-link">
+                <img src="../assets/title.png" alt="EchoDupe Home">
+            </a>
+        </div>
     </div>
 
     <script src="script.js"></script>
     <script>
         function resetData() {
-            if(confirm("Wipe your high score?")) {
+            if(confirm("Delete local highscore data?")) {
                 localStorage.removeItem("snake-high-score");
                 location.reload();
             }
