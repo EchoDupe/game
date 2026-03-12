@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="assets/title.png" width="300" alt="EchoDupe Games Logo">
+<img src="assets/title.png" width="350" alt="EchoDupe Games Logo">
 
 # 🌐 ECHODUPE | NEURAL GAMES HUB
 **The central terminal for high-fidelity EchoDupe game environments.**
@@ -33,6 +33,8 @@ Current nodes are restricted as we upgrade to the next generation of the **EchoD
 | **Data Stream** | v2.0.6-BETA |
 
 ---
+
+<img src="assets/ComingSoon.png" width="100%" alt="Coming Soon Banner">
 
 <p align="center">
   <sub>Designed and Maintained by <b>SKITXOE</b><br>
