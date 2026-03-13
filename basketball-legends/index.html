@@ -9,15 +9,44 @@
     <title>EchoDupe | Basketball Legends</title>
     <meta name="robots" content="noindex,nofollow" />
     <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    
+    <style>
+        /* This creates the floating Back button */
+        .back-to-hub {
+            position: absolute;
+            top: 15px;
+            left: 15px;
+            z-index: 9999; /* Ensures it stays above the game */
+            background: rgba(0, 0, 0, 0.6);
+            padding: 8px 15px;
+            border-radius: 8px;
+            border: 1px solid #06b6d4;
+            color: #06b6d4;
+            text-decoration: none;
+            font-family: 'Inter', sans-serif;
+            font-size: 12px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(5px);
+        }
+        .back-to-hub:hover {
+            background: #06b6d4;
+            color: #000;
+            box-shadow: 0 0 15px #06b6d4;
+        }
+    </style>
 </head>
 
 <body>
+    <a href="../index.html" class="back-to-hub">← ECHODUPEGAMES</a>
+
     <div id="content"></div>
     <div id="orientation"></div>
     <div id="loader">Loading ...</div>
-    <script type="text/javascript" src="assets/lib/nape.min.js">
-        var nape = "nape.min.js";
-    </script>
+
+    <script type="text/javascript" src="assets/lib/nape.min.js"></script>
     <script type="text/javascript" src="assets/lib/jquery-3.1.1.min.js"></script>
     <script type="text/javascript" src="assets/lib/easeljs-0.8.2.combined.js"></script>
     <script type="text/javascript" src="assets/lib/bluebird.min.js"></script>
@@ -45,38 +74,29 @@
             "onEvent": function(event) {
                 switch (event.name) {
                     case "SDK_GAME_START":
-                        // advertisement done, resume game logic and unmute audio
                         myDispatchEvent('SDK_GAME_START');
                         break;
                     case "SDK_GAME_PAUSE":
-                        // pause game logic / mute audio
                         myDispatchEvent('SDK_GAME_PAUSE');
-                        // document.getElementById("content").dispatchEvent(new Event("SDK_GAME_PAUSE"));
-                        break;
-                    case "SDK_GDPR_TRACKING":
-                        // this event is triggered when your user doesn't want to be tracked
-                        console.log("SDK_GDPR_TRACKING");
-                        break;
-                    case "SDK_GDPR_TARGETING":
-                        // this event is triggered when your user doesn't want personalised targeting of ads and such
-                        console.log("SDK_GDPR_TARGETING");
                         break;
                     case "SDK_READY":
-                        // this event is triggered when your user doesn't want personalised targeting of ads and such
                         console.log("SDK_READY");
                         break;
                 }
             },
         };
+
+        // Fix: Make sure the SDK looks in the correct folder
         (function(d, s, id) {
             var js, fjs = d.getElementsByTagName(s)[0];
             if (d.getElementById(id)) return;
             js = d.createElement(s);
             js.id = id;
-            js.src = 'js/main.min.js';
+            js.src = 'assets/lib/main.min.js'; // Changed to look in assets
             fjs.parentNode.insertBefore(js, fjs);
         }(document, 'script', 'gamedistribution-jssdk'));
-</script>
+    </script>
 
-<script type="text/javascript" src="basketball_legends_2020.min.js?22cd1e78f00425837fa0"></script></body>
+    <script type="text/javascript" src="basketball_legends_2020.min.js"></script>
+</body>
 </html>
