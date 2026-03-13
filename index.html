@@ -17,6 +17,9 @@
             color: #fff; 
             font-family: 'Inter', sans-serif; 
             overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+            padding-bottom: 60px; /* Space for the version text */
         }
 
         .bg-grid {
@@ -49,7 +52,7 @@
         }
 
         #filter-interface {
-            max-width: 600px;
+            max-width: 700px;
             margin: 0 auto 50px auto;
             text-align: center;
         }
@@ -114,6 +117,21 @@
         }
         .icon-box img { width: 100%; height: 100%; object-fit: contain; }
         .glitch-text { font-family: 'Space Grotesk', sans-serif; font-weight: 700; }
+
+        /* THE VERSION FOOTER FIX */
+        .version-footer {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            right: 0;
+            text-align: center;
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 10px;
+            color: rgba(255, 255, 255, 0.2);
+            letter-spacing: 2px;
+            pointer-events: none;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
@@ -137,6 +155,7 @@
                 <button class="category-btn" data-filter="sports">Sports</button>
                 <button class="category-btn" data-filter="simulators">Simulators</button>
                 <button class="category-btn" data-filter="action">Action</button>
+                <button class="category-btn" data-filter="horror">Horror</button>
             </div>
         </div>
     </header>
@@ -187,12 +206,6 @@
                     <span class="text-[8px] font-bold text-cyan-500/60 tracking-[0.1em] uppercase">Sector_07 // Sim</span>
                 </a>
 
-                <a href="doodlebaseball/index.html" class="game-card" data-name="doodle baseball" data-category="sports">
-                    <div class="icon-box"><img src="doodlebaseball.png" alt="Doodle Baseball"></div>
-                    <span class="glitch-text text-sm text-white mb-1">DOODLE BASEBALL</span>
-                    <span class="text-[8px] font-bold text-cyan-500/60 tracking-[0.1em] uppercase">Sector_08 // Sports</span>
-                </a>
-
                 <div id="init-node" class="game-card opacity-20 grayscale cursor-not-allowed">
                     <div class="icon-box border-dashed border-zinc-700"><i class="fa-solid fa-plus text-2xl text-zinc-700"></i></div>
                     <span class="text-[10px] font-bold text-zinc-600 tracking-widest uppercase">Initializing...</span>
@@ -202,7 +215,11 @@
         </section>
     </main>
 
-    <script>
+    <div class="version-footer">
+        V: <span id="app-version">0.0.0</span>
+    </div>
+
+    <script src="version.js"></script> <script>
         const searchInput = document.getElementById('game-search');
         const categoryBtns = document.querySelectorAll('.category-btn');
         const gameCards = document.querySelectorAll('.game-card[data-name]');
