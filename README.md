@@ -32,7 +32,7 @@ Current nodes are restricted as we upgrade to the next generation of the **EchoD
 | :--- | :--- |
 | **Neural Interface** | Active / Stable |
 | **Simulation Core** | Optimizing Assets |
-| **Data Stream** | v1.0.1-BETA |
+| **Data Stream** | v1.0.5 |
 
 ---
 
