@@ -1,46 +1,39 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="utf-8" />
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="initial-scale=1, maximum-scale=1, user-scalable=no, shrink-to-fit=no" />
     <link rel="stylesheet" href="assets/css/app.css" type="text/css" />
     <title>EchoDupe | Basketball Legends</title>
-    <meta name="robots" content="noindex,nofollow" />
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
     
     <style>
-        /* This creates the floating Back button */
-        .back-to-hub {
-            position: absolute;
-            top: 15px;
-            left: 15px;
-            z-index: 9999; /* Ensures it stays above the game */
-            background: rgba(0, 0, 0, 0.6);
-            padding: 8px 15px;
-            border-radius: 8px;
+        /* This ensures the link stays on top of the game canvas */
+        #hub-link {
+            position: fixed;
+            top: 10px;
+            left: 10px;
+            z-index: 999999; 
+            background: rgba(0, 0, 0, 0.8);
             border: 1px solid #06b6d4;
             color: #06b6d4;
-            text-decoration: none;
-            font-family: 'Inter', sans-serif;
-            font-size: 12px;
-            font-weight: 900;
+            padding: 5px 12px;
+            font-family: sans-serif;
+            font-size: 11px;
+            font-weight: bold;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(5px);
+            text-decoration: none;
+            border-radius: 4px;
         }
-        .back-to-hub:hover {
+        #hub-link:hover {
             background: #06b6d4;
             color: #000;
-            box-shadow: 0 0 15px #06b6d4;
         }
     </style>
 </head>
 
 <body>
-    <a href="../index.html" class="back-to-hub">← ECHODUPEGAMES</a>
+    <a href="../index.html" id="hub-link">← ECHODUPEGAMES</a>
 
     <div id="content"></div>
     <div id="orientation"></div>
@@ -57,11 +50,10 @@
 
     <script type="text/javascript">
         var useEvents = (typeof(Event) === 'function');
-
         var myDispatchEvent = function (name){
             var event;
             if (useEvents){
-                event =  new Event(name);
+                event = new Event(name);
             }else{
                 event = document.createEvent('Event');
                 event.initEvent(name, true, true);
@@ -79,24 +71,20 @@
                     case "SDK_GAME_PAUSE":
                         myDispatchEvent('SDK_GAME_PAUSE');
                         break;
-                    case "SDK_READY":
-                        console.log("SDK_READY");
-                        break;
                 }
             },
         };
 
-        // Fix: Make sure the SDK looks in the correct folder
         (function(d, s, id) {
             var js, fjs = d.getElementsByTagName(s)[0];
             if (d.getElementById(id)) return;
             js = d.createElement(s);
             js.id = id;
-            js.src = 'assets/lib/main.min.js'; // Changed to look in assets
+            js.src = 'js/main.min.js'; // Restored to original path
             fjs.parentNode.insertBefore(js, fjs);
         }(document, 'script', 'gamedistribution-jssdk'));
     </script>
 
-    <script type="text/javascript" src="basketball_legends_2020.min.js"></script>
+    <script type="text/javascript" src="basketball_legends_2020.min.js?22cd1e78f00425837fa0"></script>
 </body>
 </html>
