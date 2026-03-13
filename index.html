@@ -47,14 +47,13 @@
             background: rgba(10, 10, 15, 0.9); 
             border-radius: 50px;
             overflow: hidden; 
-            padding: 2px; /* This defines the thickness of the glow border */
+            padding: 2px;
             display: flex;
             justify-content: center;
             align-items: center;
             box-shadow: 0 0 50px rgba(0,0,0,0.8);
         }
 
-        /* The rotating light beam behind the content */
         .info-card::before {
             content: '';
             position: absolute;
@@ -64,7 +63,6 @@
             animation: rotate-border 4s linear infinite;
         }
 
-        /* The inner content box that masks the center of the spinning light */
         .info-card-inner {
             background: #08080a;
             width: 100%;
@@ -130,7 +128,7 @@
     <div class="fixed bottom-8 left-10 z-[60]">
         <div class="flex flex-col">
             <span class="text-[8px] font-black text-zinc-600 tracking-[0.3em] uppercase leading-none mb-1">Build_Registry</span>
-            <span class="text-[10px] font-bold text-zinc-400 uppercase italic tracking-wider">v2.0.6-BETA</span>
+            <span id="app-version" class="text-[10px] font-bold text-zinc-400 uppercase italic tracking-wider">v1.0.1-BETA</span>
         </div>
     </div>
 
@@ -160,5 +158,6 @@
         </div>
     </footer>
 
+    <script src="version.js"></script>
 </body>
 </html>
