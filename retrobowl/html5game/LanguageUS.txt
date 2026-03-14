@@ -1162,7 +1162,7 @@ match_OnsideKickingSuccess	And $teamname recovers the ball!
 match_OnsideKickingFail	But $teamname recovers the ball
 ui_Logo	Logo
 ui_Rush	Rush
-ui_View View
+ui_view View
 comm_stage_KickOffPlayer	$playername kicks off for $teamname
 ui_DataError	A data error has occurred: ($num)
 msg_BulletThrow	BULLET THROW!#You can switch between a low or high pass by tapping the screen with a second finger whilst aiming.
