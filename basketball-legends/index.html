@@ -8,38 +8,52 @@
     <title>EchoDupe | Basketball Legends</title>
     <link rel="icon" type="image/png" href="assets/title.png">
     
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
+    
     <style>
-        #return-terminal {
+        /* UPDATED BACK TO HUB BUTTON STYLE */
+        .back-to-hub {
             position: fixed;
             top: 20px;
             left: 20px;
             z-index: 2147483647 !important;
-            background: #000;
-            border: 2px solid #06b6d4;
+            background: rgba(15, 15, 20, 0.8);
+            border: 1px solid rgba(6, 182, 212, 0.5);
             color: #06b6d4;
-            padding: 12px 20px;
-            font-family: sans-serif;
-            font-size: 12px;
-            font-weight: 900;
+            padding: 10px 18px;
+            border-radius: 12px;
+            font-family: 'Helvetica', Arial, sans-serif;
+            font-weight: bold;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            box-shadow: 0 0 15px rgba(6, 182, 212, 0.2);
             text-transform: uppercase;
-            letter-spacing: 2px;
+            font-size: 11px;
+            letter-spacing: 1px;
             cursor: pointer !important;
-            box-shadow: 0 0 20px rgba(6, 182, 212, 0.4);
-            user-select: none;
-            -webkit-appearance: none;
         }
-        #return-terminal:hover {
+        .back-to-hub:hover {
             background: #06b6d4;
             color: #000;
+            box-shadow: 0 0 25px rgba(6, 182, 212, 0.6);
+            transform: translateY(-2px);
         }
+
+        /* Original logic styles kept for compatibility */
+        #return-terminal { display: none; } 
     </style>
 </head>
 
 <body style="margin:0; padding:0; background:#000;">
 
-    <button id="return-terminal" onclick="window.location.href='https://echodupe.github.io/Games/'">
-        ← EXIT_TO_HUB
-    </button>
+    <a href="https://echodupe.github.io/Games/" class="back-to-hub" id="return-terminal-new">
+        <i class="fa-solid fa-house"></i>
+        <span>Back to Hub</span>
+    </a>
 
     <div id="content"></div>
     <div id="orientation"></div>
@@ -56,14 +70,14 @@
 
     <script type="text/javascript">
         // GLOBAL REDIRECT SCRIPT
-        // This forces the button to work even if the game tries to stop it
         document.addEventListener('DOMContentLoaded', function() {
-            var btn = document.getElementById('return-terminal');
+            // Updated to target the new button ID while keeping your original logic
+            var btn = document.getElementById('return-terminal-new');
             btn.addEventListener('click', function(e) {
                 e.preventDefault();
                 e.stopPropagation();
                 window.location.replace("https://echodupe.github.io/Games/");
-            }, true); // The 'true' here makes this trigger BEFORE the game sees the click
+            }, true); 
         });
 
         var useEvents = (typeof(Event) === 'function');
