@@ -18,6 +18,7 @@ const TILE_TYPES = {
 };
 
 const houseData = {
+    // 0 = Floor, 1 = Plaster Wall, 2 = Kitchen Wall, 3 = Kitchen Floor, S = Stairs
     floor1: [
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1],
         [1, 0, 0, 0, 0, 0, 2, 2, 2, 1], 
@@ -27,7 +28,7 @@ const houseData = {
         [1, 1, 1, 0, 0, 2, 2, 2, 2, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 'S', 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 2, 2, 0, 0, 0, 0, 0, 1], // Added a small entry wall
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
     ],
     floor2: [
@@ -41,7 +42,13 @@ const houseData = {
         [1, 0, 0, 0, 0, 0, 0, 0, 'S', 1],
         [1, 0, 0, 0, 0, 0, 0, 0, 0, 1],
         [1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-    ]
+    ],
+    // SPAWN POINT: Centers player in a specific floor tile
+    spawn: { 
+        x: 4.5, 
+        y: 8.5, 
+        dir: -Math.PI / 2 // Facing North (up)
+    }
 };
 
 const decorObjects = [
