@@ -5,71 +5,68 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
     <title>EchoDupe | HallowEcho</title>
     <style>
-        :root { --neon: #06b6d4; --blood: #880000; }
-        body { margin: 0; background: #000; color: #fff; font-family: 'Courier New', monospace; overflow: hidden; }
+        :root { --neon: #06b6d4; --bg: #050505; --error: #ff0055; }
+        body { margin: 0; padding: 0; background: var(--bg); color: white; font-family: 'Courier New', monospace; overflow: hidden; user-select: none; }
         
-        /* MEGA LOADER */
+        /* THE BULLETPROOF LOADER */
         #boot-screen {
-            position: fixed; inset: 0; background: #000; z-index: 10000;
+            position: fixed; inset: 0; background: black; z-index: 99999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
         }
-        .scanline { position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: rgba(6, 182, 212, 0.1); z-index: 10001; pointer-events: none; animation: scan 4s linear infinite; }
-        @keyframes scan { from { top: 0; } to { top: 100%; } }
+        .load-box { width: 400px; height: 10px; border: 2px solid #333; position: relative; margin: 20px 0; }
+        #load-fill { width: 0%; height: 100%; background: var(--neon); transition: width 0.2s; }
         
-        .loading-bar { width: 400px; height: 4px; background: #111; border: 1px solid #333; overflow: hidden; }
-        #fill { width: 0%; height: 100%; background: var(--neon); box-shadow: 0 0 15px var(--neon); }
-        
-        /* BUTTONS */
-        .init-btn {
-            display: none; padding: 20px 60px; background: transparent; 
-            border: 1px solid var(--neon); color: var(--neon); cursor: pointer;
-            font-family: inherit; font-size: 18px; text-transform: uppercase; margin-top: 30px;
-        }
-        .init-btn:hover { background: rgba(6, 182, 212, 0.1); box-shadow: 0 0 20px var(--neon); }
+        #status-text { font-size: 14px; color: var(--neon); letter-spacing: 2px; text-transform: uppercase; }
+        #error-log { color: var(--error); font-size: 12px; margin-top: 10px; max-height: 100px; overflow-y: auto; text-align: center; }
 
-        /* HUD */
-        #hud { position: fixed; inset: 0; pointer-events: none; z-index: 50; }
-        #vignette { position: absolute; inset: 0; background: radial-gradient(circle, transparent 30%, black 150%); }
-        #crosshair { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 6px; height: 6px; border: 1px solid rgba(255,255,255,0.3); border-radius: 50%; }
+        /* BUTTONS */
+        .btn {
+            display: none; padding: 15px 40px; margin: 10px;
+            background: transparent; border: 2px solid var(--neon); color: var(--neon);
+            cursor: pointer; font-weight: bold; font-family: inherit; font-size: 16px;
+            text-decoration: none; text-align: center;
+        }
+        .btn:hover { background: var(--neon); color: black; }
+        #force-btn { border-color: var(--error); color: var(--error); }
+        #force-btn:hover { background: var(--error); color: white; }
 
         /* SETTINGS */
         #pause-menu {
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.95);
-            z-index: 100000; align-items: center; justify-content: center;
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.9);
+            z-index: 50000; align-items: center; justify-content: center;
         }
-        .menu-box { border: 1px solid var(--neon); padding: 50px; background: #050505; text-align: center; }
+        .menu-card { border: 1px solid var(--neon); padding: 40px; background: #111; width: 300px; text-align: center; }
+        
         canvas { display: block; width: 100vw; height: 100vh; image-rendering: pixelated; }
+        #crosshair { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 6px; height: 6px; background: white; border-radius: 50%; pointer-events: none; mix-blend-mode: difference; z-index: 100;}
     </style>
 </head>
 <body>
 
-    <div class="scanline"></div>
-    
     <div id="boot-screen">
-        <h1 style="color: var(--neon); letter-spacing: 10px;">HALLOWECHO</h1>
-        <div class="loading-bar"><div id="fill"></div></div>
-        <div id="status" style="margin-top: 10px; color: #555;">DOWNLOADING_CORE_FILES...</div>
-        <button id="start-btn" class="init-btn" onclick="masterInit()">START_SYSTEM</button>
-        <a href="index.html" style="color: #444; text-decoration: none; margin-top: 20px;">[ EXIT_TO_HUB ]</a>
+        <h1 style="margin:0; color:var(--neon); letter-spacing: 5px;">HALLOWECHO</h1>
+        <div class="load-box"><div id="load-fill"></div></div>
+        <div id="status-text">INITIALIZING...</div>
+        <div id="error-log"></div>
+        
+        <button id="start-btn" class="btn" onclick="launchGame()">START_SYSTEM</button>
+        <button id="force-btn" class="btn" onclick="launchGame()">FORCE_START (IGNORE ERRORS)</button>
+        <a href="index.html" class="btn" style="display:block; border: none; font-size: 12px; color: #666;">[ BACK_TO_HUB ]</a>
     </div>
 
     <div id="pause-menu">
-        <div class="menu-box">
-            <h2 style="color: var(--neon); margin-top: 0;">PAUSED</h2>
+        <div class="menu-card">
+            <h2 style="color:var(--neon); margin-top:0;">PAUSED</h2>
             <p>BRIGHTNESS</p>
-            <input type="range" id="bright-slider" min="50" max="350" value="100" style="width: 250px; accent-color: var(--neon);">
+            <input type="range" id="b-slide" min="50" max="400" value="100" style="width:100%; accent-color:var(--neon);">
+            <p>SENSITIVITY</p>
+            <input type="range" id="s-slide" min="1" max="25" value="10" style="width:100%; accent-color:var(--neon);">
             <br><br>
-            <button class="init-btn" style="display:inline-block" onclick="togglePause()">RESUME</button>
-            <br>
-            <a href="index.html" class="init-btn" style="display:inline-block; border-color: var(--blood); color: var(--blood); margin-top: 10px;">TERMINATE_SESSION</a>
+            <button class="btn" style="display:inline-block;" onclick="togglePause()">RESUME</button>
         </div>
     </div>
 
-    <div id="hud">
-        <div id="vignette"></div>
-        <div id="crosshair"></div>
-    </div>
-
+    <div id="crosshair"></div>
     <canvas id="gameCanvas"></canvas>
 
     <script src="map.js"></script>
@@ -77,32 +74,34 @@
 
     <script>
         let isPaused = false;
-        const canvas = document.getElementById('gameCanvas');
+        let gameRunning = false;
+        const cvs = document.getElementById('gameCanvas');
+
+        // FAILSAFE: If the game is stuck for 5 seconds, show the force start button.
+        setTimeout(() => {
+            if(!gameRunning) document.getElementById('force-btn').style.display = 'inline-block';
+        }, 5000);
 
         function togglePause() {
+            if(!gameRunning) return;
             isPaused = !isPaused;
             document.getElementById('pause-menu').style.display = isPaused ? 'flex' : 'none';
             if (isPaused) document.exitPointerLock();
-            else canvas.requestPointerLock();
+            else cvs.requestPointerLock();
         }
 
         window.addEventListener('keydown', (e) => {
             if (e.code === 'KeyP' || e.code === 'Escape') togglePause();
         });
 
-        canvas.addEventListener('click', () => {
-            if (!isPaused && document.getElementById('boot-screen').style.display === 'none') {
-                canvas.requestPointerLock();
-            }
+        cvs.addEventListener('click', () => {
+            if (gameRunning && !isPaused) cvs.requestPointerLock();
         });
 
-        function masterInit() {
-            // Start Audio Context (Browsers require a click)
-            if (window.AudioContext || window.webkitAudioContext) {
-                window.audioCtx = new (window.AudioContext || window.webkitAudioContext)();
-            }
+        function launchGame() {
+            gameRunning = true;
             document.getElementById('boot-screen').style.display = 'none';
-            if (window.runEngine) window.runEngine();
+            if(window.runEngine) window.runEngine();
         }
     </script>
 </body>
